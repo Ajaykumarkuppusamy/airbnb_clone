@@ -15,6 +15,10 @@ const locations = ['Bangalore, India', 'Mumbai, India', 'Delhi, India', 'Goa, In
 const App = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [filteredData, setFilteredData] = useState(imageData);
+  const [checkedValues, setCheckedValues] = useState([]);
+  const onChange = (checkedValues) => {
+    setCheckedValues(checkedValues);
+  };
 
   const showModal = () => {
     setIsModalVisible(true);
@@ -25,46 +29,44 @@ const App = () => {
   };
 
   const onFinish = (values) => {
+    console.log(values);
     const filteredResults = imageData.filter((item) => {
       return (
-        (!values.location || values.location.length === 0 || values.location.includes('All') || values.location.includes(item.location.toLowerCase())) &&
+        (values.location.length === 0 || values.location.includes(item.location)) &&
         item.startDate >= values.dateRange[0] &&
         item.endDate <= values.dateRange[1] &&
         item.priceRange >= values.priceRange[0] &&
         item.priceRange <= values.priceRange[1]
       );
     });
+    console.log(filteredResults);
     setFilteredData(filteredResults);
+    console.log(filteredData);
     setIsModalVisible(false);
   };
-  
 
-  const locationsMenu = (
-    <Menu>
-      {locations.map((location) => (
-        <Menu.Item key={location}>
-          <Checkbox value={location.toLowerCase()}>{location}</Checkbox>
-        </Menu.Item>
-      ))}
-    </Menu>
-  );
+
 
   return (
     <div className="App">
       <div className="navbar">
         <a className="navbar-brand" href="/">
           <img className="App-logo" src={logo} alt="Logo" />
-          <h2 className="red">airbnb</h2>
+          <h2 className="red">AjAv bnb</h2>
         </a>
         <div className="options">
           <button className="btn">Any week</button>
           <button className="btn btn-search">
-            Add guests<img className="searchIcon" src={searchIcon} alt="searchIcon" />
+            Add guests
+          </button>
+          <button className="filter-btn btn" onClick={showModal}>
+            Filter <MenuOutlined />
           </button>
         </div>
+
         <div className="profile-section">
           <Button className="btn" type="text">
-            Airbnb your Home
+            AjAv your Home
           </Button>
           <Button className="btn" type="text">
             <img src={globe} className="globe" alt="globe" />
@@ -77,9 +79,7 @@ const App = () => {
           </Button>
         </div>
       </div>
-      <button className="btn" onClick={showModal}>
-        Filter <MenuOutlined />
-      </button>
+      <div><h2>Check out the filter!!!!!</h2></div>
       <div className="amenities-section">
         {filteredData.map((item) => (
           <View key={item.id} imageData={item} />
@@ -88,11 +88,14 @@ const App = () => {
       <Modal title="Filter Properties" visible={isModalVisible} onCancel={handleCancel} footer={null}>
         <Form name="filterForm" onFinish={onFinish}>
           <Form.Item label="Location" name="location">
-            <Dropdown overlay={locationsMenu} >
-              <Button>
+            <Checkbox.Group
+              options={locations}
+              value={checkedValues}
+              onChange={onChange}
+            ><Button>
                 Select Locations <DownOutlined />
               </Button>
-            </Dropdown>
+            </Checkbox.Group>
           </Form.Item>
           <Form.Item label="Date Range" name="dateRange">
             <RangePicker />
